@@ -24,6 +24,9 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
     end
     follow_redirect!
     assert_template 'users/show'
+<<<<<<< HEAD
     assert_not flash.empty?
+=======
+>>>>>>> sign-up
   end
 end
