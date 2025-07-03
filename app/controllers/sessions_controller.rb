@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
       # メールアドレスに紐づくデータが存在する場合かつ、リクエストされたパスワードが一致する場合
       # セッションのリセット
       reset_session
+      params[:session][:remember_me] == '1' ? remember(user) : forget(user)
       # cookies にユーザIDを作成
       log_in user
       # ユーザーログイン後にユーザー情報のページにリダイレクトする
@@ -22,7 +23,8 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    log_out
+    # ログインされている場合にログアウトする
+    log_out if logged_in?
     redirect_to root_url, status: :see_other
   end
 end
