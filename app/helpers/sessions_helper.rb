@@ -2,7 +2,6 @@ module SessionsHelper
 
   # 渡されたユーザでログインする
   def log_in(user)
-    # セッションにユーザーIDを保存する
     session[:user_id] = user.id
     # セッションリプレイ攻撃から保護する
     # 詳しくは https://techracho.bpsinc.jp/hachi8833/2023_06_02/130443 を参照
@@ -38,6 +37,11 @@ module SessionsHelper
     end
   end
 
+  # 渡されたユーザーがカレントユーザーであればtrueを返す
+  def current_user?(user)
+    user && user == current_user
+  end
+
   # ユーザーがログインしていればtrue、その他ならfalseを返す
   def logged_in?
     !current_user.nil?
@@ -59,5 +63,10 @@ module SessionsHelper
     forget(current_user)
     reset_session
     @current_user = nil
+  end
+
+    # アクセスしようとしたURLを保存する
+  def store_location
+    session[:forwarding_url] = request.original_url if request.get?
   end
 end
