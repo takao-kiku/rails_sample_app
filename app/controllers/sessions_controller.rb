@@ -3,28 +3,28 @@ class SessionsController < ApplicationController
   def new
   end
 
-  def create 
-    # リクエストされたメールアドレスを元にユーザ情報を取得
+  def create
     user = User.find_by(email: params[:session][:email].downcase)
-    if user&.authenticate(params[:session][:password])
-      # メールアドレスに紐づくデータが存在する場合かつ、リクエストされたパスワードが一致する場合
-      forwarding_url = session[:forwarding_url]
-      # セッションのリセット
-      reset_session
-      params[:session][:remember_me] == '1' ? remember(user) : forget(user)
-      # cookies にユーザIDを作成
-      log_in user
-      # ユーザーログイン後にユーザー情報のページにリダイレクトする
-      redirect_to forwarding_url || user
+    if user && user.authenticate(params[:session][:password])
+      if user.activated?
+        forwarding_url = session[:forwarding_url]
+        reset_session
+        params[:session][:remember_me] == '1' ? remember(user) : forget(user)
+        log_in user
+        redirect_to forwarding_url || user
+      else
+        message  = "Account not activated. "
+        message += "Check your email for the activation link."
+        flash[:warning] = message
+        redirect_to root_url
+      end
     else
-      # エラーメッセージを作成する
       flash.now[:danger] = 'Invalid email/password combination'
       render 'new', status: :unprocessable_entity
     end
   end
 
   def destroy
-    # ログインされている場合にログアウトする
     log_out if logged_in?
     redirect_to root_url, status: :see_other
   end

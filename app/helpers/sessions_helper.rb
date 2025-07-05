@@ -28,7 +28,7 @@ module SessionsHelper
     elsif (user_id = cookies.encrypted[:user_id])
       # 永続セッション用クッキーにユーザーIDが保存されている場合
       user = User.find_by(id: user_id)
-      if user && user.authenticated?(cookies[:remember_token])
+      if user && user.authenticated?(:remember, cookies[:remember_token])
         # クッキーの remember_token と DB の remember_digest が一致している場合
         # セッションにログイン情報を保存
         log_in user
